@@ -4,7 +4,7 @@ import AddNew from './AddNew';
 
 class Tools extends React.Component {
     render() {
-        const { children, onAction, labelValue, onAdd, count } = this.props;
+        const { children, onAction, labelValue, onAdd, count, onRefresh } = this.props;
 
         return (
             <div className='list-tools'>
@@ -15,6 +15,9 @@ class Tools extends React.Component {
                         <option value='non-active'>Non Active</option>
                     </select>
                     <AddNew onAdd={onAdd} />
+                    <div className="refresh" onClick={onRefresh}>
+                        Refresh
+                    </div>
                 </div>
                 {children}
                 <div className='List-footer'>

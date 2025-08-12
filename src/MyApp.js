@@ -1,10 +1,11 @@
-import React from "react";
+import React, { Component } from "react";
 import Header from "./components/Header";
 import HomePage from "./pages/HomePage";
 import Footer from "./components/Footer";
 import DummyPage from "./pages/DummyPage";
+import Usage from "./pages/Usage";
 
-class MyApp extends React.Component {
+class MyApp extends Component {
 
     constructor(props) {
         super(props);
@@ -14,25 +15,23 @@ class MyApp extends React.Component {
     }
 
     handleMenuSelect = (value) => {
-        console.log(value);
+        // console.log(value);
         this.setState({
             currentSelected: value
         });
     }
 
     getPage() {
-        const {
-            currentSelected
-        } = this.state;
+        const { currentSelected } = this.state;
         switch (currentSelected) {
             case "home":
                 return <HomePage />;
             case "usage":
-                return <DummyPage name="Usage" title="Usage" />;
+                return <Usage key="usage" name="Usage" title="Usage" />;
             case "settings":
-                return <DummyPage name="Settings" title="Settings" />;
+                return <DummyPage key="settings" name="Settings" title="Settings" />;
             case "logout":
-                return <DummyPage name="Logout" title="Logout" />;
+                return <DummyPage key="logout" name="Logout" title="Logout" />;
             default:
                 break;
         }
@@ -43,7 +42,7 @@ class MyApp extends React.Component {
             <div className='app'>
                 <Header onMenuSelect={this.handleMenuSelect} />
                 <div className='app-body'>
-                    <HomePage />
+                    {this.getPage()}
                 </div>
                 <Footer />
             </div>

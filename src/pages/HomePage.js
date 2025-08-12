@@ -1,103 +1,97 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import Tools from "../components/Tools";
 import SimpleList from "../list/SimpleList";
+import JustInfo from "./JustInfo";
+import {
+    MyContext,
+    MyNewContext
+} from './mycontexts';
 
+function HomePage() {
 
-class HomePage extends React.Component {
+    const [showLabel, setShowLabel] = useState(true);
+    const [activeState, setActiveState] = useState("all");
+    const [data, setData] = useState([]);
 
-    // state initialization
-    constructor(props) {
-        super(props);
-        this.state = {
-            data: [],
-            activeState: "all",
-            message: ""
-        };
-    }
-
-    componentDidMount() {
-        console.log("componentDidMount");
+    useEffect(() => {
         fetch('/data.json')
-            .then((data) => { return data.json(); })
             .then((data) => {
-                this.setState({
-                    data: data
-                });
+                return data.json();
             })
-    }
+            .then((data) => {
+                setData(data);
+            })
+    }, []);
 
-    componentDidUpdate(prevProps, prevState) {
-        console.log("componentDidUpdate");
 
-        if (prevState.message !== this.state.message) {
-            this.setState({
-                message: "message updated"
+    const handleRefresh = () => {
+        fetch('/data2.json')
+            .then((data) => data.json())
+            .then((data) => {
+                setData(data);
             });
+    }
+
+    const onListChange = (evt) => {
+        setActiveState(evt.target.value);
+    };
+
+    const handleDelete = (item) => {
+        setData(data.filter((element) => element.id !== item.id));
+    };
+
+    const handleLabelClick = (arg) => {
+        setActiveState(arg);
+    };
+
+    const handleAdd = (item) => {
+        setData([item, ...data]);
+    }
+
+
+    const handleShowLabel = (evt) => {
+        setShowLabel(evt.target.checked);
+    }
+
+
+    const newList = data.filter((item) => {
+        if (activeState === "all") {
+            return true;
         }
-    }
-
-    componentWillUnmount() {
-        console.log("componentWillUnmount");
-    }
-
-    onListChange = (evt) => {
-        const value = evt.target.value;
-        this.setState({
-            activeState: value
-        });
-    }
-
-    handleDelete = (item) => {
-        const newList = this.state.data.filter((element) =>
-            element.id !== item.id
-        );
-
-        this.setState({
-            data: newList
-        });
-
-    }
-
-    handleLabelClick = (arg) => {
-        this.setState({
-            activeState: arg
-        });
-    }
-
-    handleAdd = (item) => {
-        this.setState({
-            data: [item, ...this.state.data]
-        });
-    }
-
-    render() {
-
-        const {
-            data,
-            activeState
-        } = this.state;
-
-
-        const newList = this.state.data.filter((item) => {
-            if (activeState === "all") {
-                return true;
-            }
-            if (activeState === "active") {
-                return item.isActive === true;
-            }
-            if (activeState === "non-active") {
-                return item.isActive === false;
-            }
-            return false;
+        if (activeState === "active") {
+            return item.isActive === true;
         }
-        );
+        if (activeState === "non-active") {
+            return item.isActive === false;
+        }
+        return false;
+    });
 
-        return (
-            <Tools onAdd={this.handleAdd} labelValue={activeState} onAction={this.onListChange} count={data.length}>
-                <SimpleList onLabelClick={this.handleLabelClick} data={newList} onAction={this.handleDelete} />
-            </Tools>
-        );
-    }
+    const handleCLick = useCallback(
+        () => {
+            console.log("Click", activeState);
+        }, [activeState]);
+
+
+    return (
+        (
+            <div>
+                <div>
+                    <input checked={showLabel} type="checkbox" onChange={handleShowLabel} /> Show Label
+                </div>
+                <MyNewContext.Provider value={100}>
+                    <MyContext.Provider value={showLabel}>
+                        <Tools onAdd={handleAdd} labelValue={activeState} onAction={onListChange} count={data.length} onRefresh={handleRefresh}>
+                            <SimpleList onLabelClick={handleLabelClick} data={newList} onAction={handleDelete} />
+                        </Tools>
+                        <JustInfo onClick={handleCLick} showLabel={showLabel} />
+                    </MyContext.Provider>
+                </MyNewContext.Provider>
+            </div>
+        )
+    );
 }
 
+
 export default HomePage;
+

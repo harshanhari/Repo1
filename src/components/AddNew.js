@@ -34,7 +34,6 @@ class AddNew extends React.Component {
     }
 
     handleClick = () => {
-        console.log(this.state);
         const {
             titleInput,
             decrInput,
